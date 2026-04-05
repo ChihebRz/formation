@@ -27,14 +27,76 @@ public class AuthController {
         Utilisateur user = utilisateurRepository.findByLogin(request.getLogin())
                 .orElse(null);
 
-        if (user == null) {
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Login ou mot de passe incorrect");
         }
 
-        // DEBUG: Accepter n'importe quel password pour tester
         String token = jwtUtil.generateToken(user.getLogin(), user.getRole().getNom());
         return ResponseEntity.ok(new LoginResponse(token, user.getRole().getNom(), user.getLogin()));
+    }
+
+    @GetMapping("/health")
+    public ResponseEntity<?> health() {
+        return ResponseEntity.ok(new java.util.HashMap<String, Object>() {{
+            put("status", "UP");
+            put("backend", "Backend is running on port 8080");
+            put("timestamp", System.currentTimeMillis());
+        }});
+    }
+
+    @PostMapping("/generate-hash")
+    public ResponseEntity<?> generateHash(@RequestBody String password) {
+        String hash = passwordEncoder.encode(password);
+        return ResponseEntity.ok("Hash for '" + password + "': " + hash);
+    }
+
+    @GetMapping("/check-admin")
+    public ResponseEntity<?> checkAdmin() {
+        var user = utilisateurRepository.findByLogin("admin");
+        if (user.isPresent()) {
+            Utilisateur admin = user.get();
+            return ResponseEntity.ok(new java.util.HashMap<String, Object>() {{
+                put("login", admin.getLogin());
+                put("passwordHash", admin.getPassword());
+                put("roleId", admin.getRole().getId());
+                put("roleName", admin.getRole().getNom());
+                put("message", "User admin existe dans la base");
+            }});
+        }
+        return ResponseEntity.status(404).body("Admin not found");
+    }
+
+    @PostMapping("/validate-token")
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("❌ No Bearer token found");
+        }
+        
+        String token = authHeader.substring(7);
+        System.out.println("🔍 Backend validating token: " + token.substring(0, 50) + "...");
+        
+        boolean isValid = jwtUtil.validateToken(token);
+        System.out.println("✅ Token validation result: " + isValid);
+        
+        if (isValid) {
+            String login = jwtUtil.extractLogin(token);
+            String role = jwtUtil.extractRole(token);
+            System.out.println("✅ Token valid - Login: " + login + ", Role: " + role);
+            
+            return ResponseEntity.ok(new java.util.HashMap<String, Object>() {{
+                put("valid", true);
+                put("login", login);
+                put("role", role);
+                put("message", "✅ Token is VALID");
+            }});
+        } else {
+            System.out.println("❌ Token validation FAILED");
+            return ResponseEntity.status(401).body(new java.util.HashMap<String, Object>() {{
+                put("valid", false);
+                put("message", "❌ Token is INVALID");
+            }});
+        }
     }
 }
 

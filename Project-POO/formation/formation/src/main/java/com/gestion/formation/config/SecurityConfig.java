@@ -27,7 +27,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8081", "http://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
@@ -45,9 +45,11 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // LOGIN - PAS DE RESTRICTIONS
-                .requestMatchers("/api/auth/login").permitAll()
-                // TOUT LE RESTE - JUSTE AUTHENTIFIÉ (JWT token)
+                // PUBLIC ENDPOINTS - LOGIN
+                .requestMatchers("/api/auth/**").permitAll()
+                // PUBLIC ENDPOINTS - ALL API DATA (permitAll means no authentication required)
+                .requestMatchers("/api/**").permitAll()
+                // EVERYTHING ELSE - REQUIRES AUTHENTICATION
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -65,6 +67,12 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 }
+
+
+
+
+
+
 
 
 
