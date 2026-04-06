@@ -36,15 +36,6 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponse(token, user.getRole().getNom(), user.getLogin()));
     }
 
-    @GetMapping("/health")
-    public ResponseEntity<?> health() {
-        return ResponseEntity.ok(new java.util.HashMap<String, Object>() {{
-            put("status", "UP");
-            put("backend", "Backend is running on port 8080");
-            put("timestamp", System.currentTimeMillis());
-        }});
-    }
-
     @PostMapping("/generate-hash")
     public ResponseEntity<?> generateHash(@RequestBody String password) {
         String hash = passwordEncoder.encode(password);

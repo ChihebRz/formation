@@ -21,7 +21,7 @@ const ParticipantsPage = () => {
       setParticipants(res.data || []);
     } catch (error) {
       console.error("Erreur:", error);
-      toast({ id: Date.now().toString(), title: "Erreur", description: "Impossible de charger les participants" });
+      toast({ id: "error-load", title: "Erreur", description: "Impossible de charger les participants", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -31,11 +31,11 @@ const ParticipantsPage = () => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer ce participant ?")) {
       try {
         await API.delete(`/participants/${participant.id}`);
-        toast({ id: Date.now().toString(), title: "Succès", description: "Participant supprimé" });
+        toast({ id: "success-delete", title: "Succès", description: "Participant supprimé" });
         loadParticipants();
       } catch (error) {
         console.error("Erreur:", error);
-        toast({ id: Date.now().toString(), title: "Erreur", description: "Impossible de supprimer le participant" });
+        toast({ id: "error-delete", title: "Erreur", description: "Impossible de supprimer le participant", variant: "destructive" });
       }
     }
   };
@@ -65,12 +65,11 @@ const ParticipantsPage = () => {
       data={participants}
       searchPlaceholder="Rechercher un participant..."
       isLoading={isLoading}
-      onAdd={() => toast({ id: Date.now().toString(), title: "Ajouter un participant", description: "Fonctionnalité à venir" })}
-      onEdit={() => toast({ id: Date.now().toString(), title: "Modifier", description: "Fonctionnalité à venir" })}
+      onAdd={() => toast({ id: "add-participant", title: "Ajouter un participant", description: "Fonctionnalité à venir" })}
+      onEdit={() => toast({ id: "edit-participant", title: "Modifier", description: "Fonctionnalité à venir" })}
       onDelete={handleDelete}
     />
   );
 };
 
 export default ParticipantsPage;
-

@@ -20,7 +20,7 @@ const ProfilsPage = () => {
       setProfils(res.data || []);
     } catch (error) {
       console.error("Erreur:", error);
-      toast({ title: "Erreur", description: "Impossible de charger les profils" });
+      toast({ id: "error-load", title: "Erreur", description: "Impossible de charger les profils", variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -30,11 +30,11 @@ const ProfilsPage = () => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer ce profil ?")) {
       try {
         await API.delete(`/profils/${profil.id}`);
-        toast({ title: "Succès", description: "Profil supprimé" });
+        toast({ id: "success-delete", title: "Succès", description: "Profil supprimé" });
         loadProfils();
       } catch (error) {
         console.error("Erreur:", error);
-        toast({ title: "Erreur", description: "Impossible de supprimer le profil" });
+        toast({ id: "error-delete", title: "Erreur", description: "Impossible de supprimer le profil", variant: "destructive" });
       }
     }
   };
@@ -53,12 +53,11 @@ const ProfilsPage = () => {
       searchKey="libelle"
       searchPlaceholder="Rechercher un profil..."
       isLoading={isLoading}
-      onAdd={() => toast({ title: "Ajouter un profil", description: "Fonctionnalité à venir" })}
-      onEdit={() => toast({ title: "Modifier", description: "Fonctionnalité à venir" })}
+      onAdd={() => toast({ id: "add-profil", title: "Ajouter un profil", description: "Fonctionnalité à venir" })}
+      onEdit={() => toast({ id: "edit-profil", title: "Modifier", description: "Fonctionnalité à venir" })}
       onDelete={handleDelete}
     />
   );
 };
 
 export default ProfilsPage;
-
