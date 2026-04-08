@@ -1,21 +1,23 @@
 export type AppRole = "simple_utilisateur" | "responsable" | "administrateur";
 
 export const normalizeRole = (role?: string | null): AppRole | null => {
-  const normalized = role?.trim().toLowerCase();
-  if (normalized === "simple_utilisateur" || normalized === "responsable" || normalized === "administrateur") {
-    return normalized;
-  }
-  return null;
-};
+  if (!role) return null;
 
-export const hasAnyRole = (
-  first: AppRole[] | string | null | undefined,
-  second?: AppRole[] | string | null
-) => {
-  const allowedRoles = Array.isArray(first) ? first : Array.isArray(second) ? second : [];
-  const role = Array.isArray(first) ? second : first;
-  const normalizedRole = normalizeRole(role);
-  return normalizedRole ? allowedRoles.includes(normalizedRole) : false;
+  // Accept legacy formats such as ROLE_ADMINISTRATEUR, "simple utilisateur", or "admin".
+  const cleaned = role.trim().toLowerCase().replace(/[\s-]+/g, "_");
+  const normalized = cleaned.startsWith("role_") ? cleaned.slice(5) : cleaned;
+
+  if (normalized === "simple_utilisateur" || normalized === "simpleutilisateur" || normalized === "simple") {
+    return "simple_utilisateur";
+  }
+  if (normalized === "responsable") {
+    return "responsable";
+  }
+  if (normalized === "administrateur" || normalized === "admin") {
+    return "administrateur";
+  }
+
+  return null;
 };
 
 export const canAccessRole = (allowedRoles: AppRole[], role?: string | null) => {
@@ -33,6 +35,10 @@ export const getDefaultRoute = (role?: string | null) => {
   }
   return "/login";
 };
+
+
+
+
 
 
 
