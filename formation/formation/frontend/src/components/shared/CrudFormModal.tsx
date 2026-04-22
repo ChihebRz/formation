@@ -192,7 +192,7 @@ const CrudFormModal = ({
           })}
         </div>
 
-        {error ? <p className="mt-4 text-sm text-destructive">{error}</p> : null}
+        {error ? <p className="mt-4 text-sm text-destructive whitespace-pre-line">{error}</p> : null}
 
         <div className="mt-6 flex items-center justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
@@ -208,6 +208,7 @@ const CrudFormModal = ({
 };
 
 export default CrudFormModal;
+
 
 
 
