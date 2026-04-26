@@ -34,12 +34,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleAll(Exception ex) {
+        ex.printStackTrace(); // Log the full stack trace to the console
+        Map<String, Object> body = new HashMap<>();
+        body.put("code", "INTERNAL_SERVER_ERROR");
+        body.put("message", ex.getMessage());
+        body.put("type", ex.getClass().getSimpleName());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntime(RuntimeException ex) {
+        ex.printStackTrace();
         Map<String, Object> body = new HashMap<>();
         body.put("code", "BUSINESS_ERROR");
         body.put("message", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }
 
