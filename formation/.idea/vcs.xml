@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/formation" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/upstream-repo" vcs="Git" />
   </component>
 </project>
