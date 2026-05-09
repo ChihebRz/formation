@@ -137,6 +137,11 @@ const PlanningPageNew = () => {
     }
   };
 
+  // Helper function to format date as YYYY-MM-DD in local timezone
+  const formatDateLocal = (date: Date): string => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  };
+
   const getCalendarDays = (): CalendarDay[] => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
@@ -146,13 +151,16 @@ const PlanningPageNew = () => {
 
     const daysInPrevMonth = prevLastDay.getDate();
     const daysInMonth = lastDay.getDate();
-    const startDate = firstDay.getDay();
+    // Get day of week (0=Sunday, 1=Monday, etc.) and convert to Monday-based (0=Monday, 6=Sunday)
+    const dayOfWeek = firstDay.getDay();
+    const startDate = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to Monday-based index
 
     const days: CalendarDay[] = [];
 
+    // Add days from previous month
     for (let i = daysInPrevMonth - startDate + 1; i <= daysInPrevMonth; i++) {
       const date = new Date(year, month - 1, i);
-      const dateString = date.toISOString().split("T")[0];
+      const dateString = formatDateLocal(date);
       days.push({
         date: dateString,
         day: i,
@@ -163,10 +171,13 @@ const PlanningPageNew = () => {
       });
     }
 
-    const today = new Date().toISOString().split("T")[0];
+    // Get today's date in local timezone (not UTC)
+    const todayDate = new Date();
+    const today = formatDateLocal(todayDate);
+    
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(year, month, i);
-      const dateString = date.toISOString().split("T")[0];
+      const dateString = formatDateLocal(date);
       const events = plannings.filter(
         (p) => dateString >= p.dateDebut && dateString <= p.dateFin
       );
@@ -184,7 +195,7 @@ const PlanningPageNew = () => {
     const remainingDays = 42 - days.length;
     for (let i = 1; i <= remainingDays; i++) {
       const date = new Date(year, month + 1, i);
-      const dateString = date.toISOString().split("T")[0];
+      const dateString = formatDateLocal(date);
       days.push({
         date: dateString,
         day: i,
@@ -202,7 +213,7 @@ const PlanningPageNew = () => {
     if (!startDate || duration <= 0) return "";
     const date = new Date(startDate);
     date.setDate(date.getDate() + (duration - 1));
-    return date.toISOString().split("T")[0];
+    return formatDateLocal(date);
   };
 
   const checkConflicts = async (): Promise<boolean> => {
